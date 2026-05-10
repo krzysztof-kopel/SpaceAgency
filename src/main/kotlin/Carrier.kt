@@ -22,11 +22,11 @@ fun main(args: Array<String>) = runBlocking(Dispatchers.IO) {
     }
 
     val channel = configureSystem(this)
-    launch{ listenFromAdmin(channel, "carrier") }
+    launch{ listenFromAdmin(channel, "carrier", "carrier${args.joinToString("_")}") }
 
     args.forEach{
         channel.queueDeclare(it, exclusive=false)
-        channel.queueBind(it, "ex", "*.$it")
+        channel.queueBind(it, "ex", it)
     }
 
     channel.basicQos(count=1u, global=false)

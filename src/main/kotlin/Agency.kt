@@ -15,7 +15,7 @@ fun main(args: Array<String>): Unit = runBlocking(Dispatchers.IO) {
     var actionNumber = 1
 
     val channel = configureSystem(this)
-    launch{ listenFromAdmin(channel, "agency") }
+    launch{ listenFromAdmin(channel, "agency", agencyName) }
 
     while (true) {
         println("Select service:\n1. Send people\n2. Send cargo\n3. Send a satellite\n4. Exit")
@@ -33,9 +33,8 @@ fun main(args: Array<String>): Unit = runBlocking(Dispatchers.IO) {
             break
         }
 
-        val routingKey = "$agencyName.$serviceType"
         val message = "type $serviceType, from $agencyName (number ${actionNumber++})"
-        channel.basicPublish(message.toByteArray(), "ex", routingKey)
+        channel.basicPublish(message.toByteArray(), "ex", serviceType)
         println("Sent $message")
     }
 

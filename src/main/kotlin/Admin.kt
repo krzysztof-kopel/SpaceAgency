@@ -24,9 +24,9 @@ suspend fun sender(channel: AMQPChannel) {
 fun main(): Unit = runBlocking(Dispatchers.IO) {
     val channel = configureSystem(this)
 
-    val logQueue = channel.queueDeclare("", exclusive=true, autoDelete=true).queueName
-    channel.queueBind(logQueue, "ex", "#")
-    val consumer = channel.basicConsume(logQueue)
+    channel.queueDeclare("admin_listener", exclusive=true, autoDelete=true)
+    channel.queueBind("admin_listener", "ex", "#")
+    val consumer = channel.basicConsume("admin_listener")
 
     launch{ sender(channel) }
 

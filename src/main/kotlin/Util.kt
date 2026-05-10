@@ -5,13 +5,14 @@ import dev.kourier.amqp.connection.amqpConfig
 import dev.kourier.amqp.connection.createAMQPConnection
 import kotlinx.coroutines.CoroutineScope
 
-suspend fun listenFromAdmin(channel: AMQPChannel, userType: String) {
-    val uniqueQueue = channel.queueDeclare("", exclusive=true, autoDelete=true).queueName
+suspend fun listenFromAdmin(channel: AMQPChannel, userType: String, userName:String) {
+    val uniqueQueueName = "admin_to_$userName"
+    channel.queueDeclare(uniqueQueueName, exclusive=true, autoDelete=true)
 
-    channel.queueBind(uniqueQueue, "ex", "admin.$userType")
-    channel.queueBind(uniqueQueue, "ex", "admin.all")
+    channel.queueBind(uniqueQueueName, "ex", "admin.$userType")
+    channel.queueBind(uniqueQueueName, "ex", "admin.all")
 
-    val consumer = channel.basicConsume(uniqueQueue)
+    val consumer = channel.basicConsume(uniqueQueueName)
 
     for (message in consumer) {
         println("Message from admin: ${message.message.body.decodeToString()}")
